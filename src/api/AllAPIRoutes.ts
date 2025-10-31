@@ -106,13 +106,19 @@ DELETE /api/v2/agent-services/:id         -> Remove agent-service assignment
 =========================================================== */
 /*
 ---- Ticket Routes ----
-POST   /api/v2/ticket/new                 -> Create new ticket
-GET    /api/v2/ticket/all                 -> Get all tickets
-GET    /api/v2/ticket/:ticketId           -> Get ticket by ID
-GET    /api/v2/ticket/next/:agentId       -> Get next ticket for agent
-PATCH  /api/v2/ticket/reassign/:ticketId  -> Reassign ticket to another counter
-PATCH  /api/v2/ticket/close/:ticketId     -> Close ticket
+POST   /api/v2/ticket/new                     -> Create new ticket
+GET    /api/v2/ticket/all                     -> Get all tickets
+GET    /api/v2/ticket/:ticketId               -> Get ticket by ID
+GET    /api/v2/ticket/next/:agentId           -> Get next ticket for agent
+PATCH  /api/v2/ticket/reassign/:ticketId      -> Reassign ticket to another counter
+PATCH  /api/v2/ticket/close/:ticketId         -> Close ticket
+GET    /api/v2/ticket/waiting                 -> Get all waiting tickets
+PATCH  /api/v2/ticket/missing/:ticketId       -> Mark ticket as missing
+PATCH  /api/v2/ticket/pause/:ticketId         -> Pause ticket
+PATCH  /api/v2/ticket/assign/:ticketId        -> Assign ticket to a counter
+GET    /api/v2/ticket/paused/:agentId         -> Get today's paused tickets by agent (full details)
 */
+
 
 /* ===========================================================
    NOTES

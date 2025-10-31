@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getServices, type Service } from "../../api/kioskAPI";
-import { useToast } from "../../context/ToastContext";
+import { useToast } from "../../context/toast/ToastContext";
 
 export default function ServiceSelect() {
   const [services, setServices] = useState<Service[]>([]);

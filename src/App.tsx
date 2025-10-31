@@ -4,7 +4,7 @@ import Welcome from "./pages/kiosk/Welcome";
 import ServiceSelect from "./pages/kiosk/ServiceSelect";
 import CustomerForm from "./pages/kiosk/CustomerForm";
 import TicketWrapper from "./pages/kiosk/TicketDisplayWrapper";
-import { ToastProvider } from "./context/ToastContext";
+import { ToastProvider } from "./context/toast/ToastContext";
 import GetServices from "./pages/getServices";
 
 function App() {
