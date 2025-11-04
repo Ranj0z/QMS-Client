@@ -1,7 +1,7 @@
-// src/pages/Agent Dashboard/TicketActions.tsx
-import { useState, useContext } from "react";
+// src/pages/Agent/TicketActions.tsx
+import { useState } from "react";
 import { agentAPI } from "../../api/agentAPI";
-import { ToastContext } from "../../context/toast/ToastContext";
+import { useToast } from "../../context/toast/useToast";
 
 type Ticket = {
   id: number;
@@ -20,20 +20,18 @@ export default function TicketActions({
   agentId,
   onActionComplete,
 }: TicketActionsProps) {
-  const toast = useContext(ToastContext);
-  if (!toast) throw new Error("TicketActions must be used within a ToastProvider");
-  const { showToast } = toast;
-
+  const { showToast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
   const [isCoolingDown, setIsCoolingDown] = useState(false);
   const [inProgress, setInProgress] = useState(false);
 
-  // Utility to apply cooldown after any action
+  // cooldown utility
   const startCooldown = () => {
     setIsCoolingDown(true);
-    setTimeout(() => setIsCoolingDown(false), 10000); // 10 seconds
+    setTimeout(() => setIsCoolingDown(false), 10000);
   };
 
+  // handle next ticket
   const handleNext = async () => {
     try {
       setIsProcessing(true);
@@ -44,7 +42,7 @@ export default function TicketActions({
         startCooldown();
         onActionComplete();
       } else {
-        showToast("error", res.message || "Failed to load next ticket");
+        showToast("error", res.message || "Failed to fetch next ticket");
       }
     } catch {
       showToast("error", "Error fetching next ticket");
@@ -53,11 +51,33 @@ export default function TicketActions({
     }
   };
 
+  // handle pause
+  const handlePause = async () => {
+    if (!ticket) return;
+    try {
+      setIsProcessing(true);
+      const res = await agentAPI.pauseTicket(ticket.id);
+      if (res.success) {
+        showToast("success", "Ticket paused");
+        setInProgress(false);
+        startCooldown();
+        onActionComplete();
+      } else {
+        showToast("error", res.message || "Failed to pause ticket");
+      }
+    } catch {
+      showToast("error", "Error pausing ticket");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  // handle missing
   const handleMissing = async () => {
     if (!ticket) return;
     try {
       setIsProcessing(true);
-      const res = await agentAPI.closeTicket(ticket.id); // replace with missing API if implemented
+      const res = await agentAPI.markTicketMissing(ticket.id);
       if (res.success) {
         showToast("success", "Ticket marked as missing");
         setInProgress(false);
@@ -73,6 +93,7 @@ export default function TicketActions({
     }
   };
 
+  // handle escalate
   const handleEscalate = async () => {
     if (!ticket) return;
     try {
@@ -99,6 +120,7 @@ export default function TicketActions({
     }
   };
 
+  // handle close
   const handleClose = async () => {
     if (!ticket) return;
     try {
@@ -119,64 +141,44 @@ export default function TicketActions({
     }
   };
 
-  const handlePause = async () => {
-    if (!ticket) return;
-    try {
-      setIsProcessing(true);
-      // placeholder until pause endpoint is live
-      showToast("success", "Ticket paused");
-      setInProgress(false);
-      startCooldown();
-      onActionComplete();
-    } catch {
-      showToast("error", "Error pausing ticket");
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
   const disableNext = inProgress || isProcessing || isCoolingDown;
   const disableOthers =
     !ticket || isProcessing || isCoolingDown || !inProgress;
 
   return (
-    <div className="flex flex-wrap gap-2 mt-4">
+    <div className="flex flex-wrap justify-center gap-2 mt-4">
       <button
         onClick={handleNext}
         disabled={disableNext}
-        className="px-3 py-1 border rounded"
+        className="btn btn-primary btn-sm"
       >
         Next
       </button>
-
-      <button
-        onClick={handleMissing}
-        disabled={disableOthers}
-        className="px-3 py-1 border rounded"
-      >
-        Missing
-      </button>
-
-      <button
-        onClick={handleEscalate}
-        disabled={disableOthers}
-        className="px-3 py-1 border rounded"
-      >
-        Escalate
-      </button>
-
       <button
         onClick={handlePause}
         disabled={disableOthers}
-        className="px-3 py-1 border rounded"
+        className="btn btn-warning btn-sm"
       >
         Pause
       </button>
-
+      <button
+        onClick={handleMissing}
+        disabled={disableOthers}
+        className="btn btn-error btn-sm"
+      >
+        Missing
+      </button>
+      <button
+        onClick={handleEscalate}
+        disabled={disableOthers}
+        className="btn btn-accent btn-sm"
+      >
+        Escalate
+      </button>
       <button
         onClick={handleClose}
         disabled={disableOthers}
-        className="px-3 py-1 border rounded"
+        className="btn btn-success btn-sm"
       >
         Close
       </button>

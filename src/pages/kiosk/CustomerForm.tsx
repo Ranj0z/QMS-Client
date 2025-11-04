@@ -2,7 +2,7 @@
 import { useState, type FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { createTicket } from "../../api/kioskAPI";
-import { useToast } from "../../context/toast/ToastContext";
+import { useToast } from "../../context/toast/useToast";
 
 export default function CustomerForm() {
   const location = useLocation();

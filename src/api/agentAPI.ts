@@ -64,7 +64,9 @@ export type ActivityLog = {
 export async function getAgentTickets(
   agentId: number
 ): Promise<ApiResponse<AgentTicket[]>> {
-  const res = await apiClient.get<ApiResponse<AgentTicket[]>>(`/ticket/all?agent=${agentId}`);
+  const res = await apiClient.get<ApiResponse<AgentTicket[]>>(
+    `/ticket/all?agent=${agentId}`
+  );
   return res.data;
 }
 
@@ -72,7 +74,41 @@ export async function getAgentTickets(
 export async function getNextTicket(
   agentId: number
 ): Promise<ApiResponse<AgentTicket>> {
-  const res = await apiClient.get<ApiResponse<AgentTicket>>(`/ticket/next/${agentId}`);
+  const res = await apiClient.get<ApiResponse<AgentTicket>>(
+    `/ticket/next/${agentId}`
+  );
+  return res.data;
+}
+
+// ✅ Assign a ticket to this agent (manual assignment via modal)
+export async function assignTicketToAgent(
+  ticketId: number,
+  agentId: number
+): Promise<ApiResponse<AgentTicket>> {
+  const res = await apiClient.patch<ApiResponse<AgentTicket>>(
+    `/ticket/assign/${ticketId}`,
+    { agent_id: agentId }
+  );
+  return res.data;
+}
+
+// ✅ Mark ticket as missing
+export async function markTicketMissing(
+  ticketId: number
+): Promise<ApiResponse<AgentTicket>> {
+  const res = await apiClient.patch<ApiResponse<AgentTicket>>(
+    `/ticket/missing/${ticketId}`
+  );
+  return res.data;
+}
+
+// ✅ Pause ticket
+export async function pauseTicket(
+  ticketId: number
+): Promise<ApiResponse<AgentTicket>> {
+  const res = await apiClient.patch<ApiResponse<AgentTicket>>(
+    `/ticket/pause/${ticketId}`
+  );
   return res.data;
 }
 
@@ -80,7 +116,9 @@ export async function getNextTicket(
 export async function closeTicket(
   ticketId: number
 ): Promise<ApiResponse<AgentTicket>> {
-  const res = await apiClient.patch<ApiResponse<AgentTicket>>(`/ticket/close/${ticketId}`);
+  const res = await apiClient.patch<ApiResponse<AgentTicket>>(
+    `/ticket/close/${ticketId}`
+  );
   return res.data;
 }
 
@@ -88,34 +126,67 @@ export async function closeTicket(
 export async function escalateTicket(
   payload: EscalationNote
 ): Promise<ApiResponse<NoteResponse>> {
-  const res = await apiClient.post<ApiResponse<NoteResponse>>("/note/new", payload);
+  const res = await apiClient.post<ApiResponse<NoteResponse>>(
+    "/note/new",
+    payload
+  );
   return res.data;
 }
 
-// ✅ Log activity (for any action)
+// ✅ Log action (for any ticket activity)
 export async function logAction(
   payload: ActivityLog
 ): Promise<ApiResponse<ActivityLog>> {
-  const res = await apiClient.post<ApiResponse<ActivityLog>>("/activity-log/new", payload);
+  const res = await apiClient.post<ApiResponse<ActivityLog>>(
+    "/activity-log/new",
+    payload
+  );
   return res.data;
 }
 
-// ✅ (Optional) Get summary metrics (unserved/missing counts)
-export async function getAgentSummary(
+// ✅ Get unserved (waiting) tickets for branch/services
+export async function getUnservedCount(
+  branchId: number
+): Promise<ApiResponse<AgentTicket[]>> {
+  const res = await apiClient.get<ApiResponse<AgentTicket[]>>(
+    `/ticket/waiting?branch=${branchId}`
+  );
+  return res.data;
+}
+
+// ✅ Get missing tickets for branch
+export async function getMissingCount(
+  branchId: number
+): Promise<ApiResponse<AgentTicket[]>> {
+  const res = await apiClient.get<ApiResponse<AgentTicket[]>>(
+    `/ticket/missing?branch=${branchId}`
+  );
+  return res.data;
+}
+
+// ✅ Get paused tickets (filtered by agent)
+export async function getPausedCount(
   agentId: number
-): Promise<ApiResponse<ActivityLog[]>> {
-  const res = await apiClient.get<ApiResponse<ActivityLog[]>>(`/activity-log/agent/${agentId}`);
+): Promise<ApiResponse<AgentTicket[]>> {
+  const res = await apiClient.get<ApiResponse<AgentTicket[]>>(
+    `/ticket/paused/${agentId}`
+  );
   return res.data;
 }
 
 /* ===========================================================
-   EXPORTS
+   EXPORT
 =========================================================== */
 export const agentAPI = {
   getAgentTickets,
   getNextTicket,
+  assignTicketToAgent,
+  markTicketMissing,
+  pauseTicket,
   closeTicket,
   escalateTicket,
   logAction,
-  getAgentSummary,
+  getUnservedCount,
+  getMissingCount,
+  getPausedCount,
 };

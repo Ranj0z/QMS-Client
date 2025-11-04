@@ -1,4 +1,4 @@
-// src/context/toast/ToastContext.ts
+// src/context/toast/ToastContext.tsx
 import { createContext } from "react";
 import type { ToastType } from "./toastUtils";
 
